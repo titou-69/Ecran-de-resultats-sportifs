@@ -1,92 +1,71 @@
 <!DOCTYPE html>
-margin: 10px 0;
-}
-
-
-.close-btn {
-margin-top: 20px;
-background: transparent;
-border: 2px solid #3aff3a;
-color: #3aff3a;
-padding: 8px;
-width: 100%;
-cursor: pointer;
-font-family: 'Orbitron', monospace;
-}
-
-
-.close-btn:hover {
-background: rgba(0,255,0,0.15);
-}
-</style>
-</head>
-<body>
-
-
-<h1>Entrée des résultats sportifs</h1>
-
-
-<div class="form-container">
-<label>Type de sport</label>
-<input id="sport" placeholder="Ex : Athlétisme, Football…" />
-
-
-<label>Athlète 1</label>
-<input id="athlete1" placeholder="Nom" />
-<input id="perf1" placeholder="Performance" />
-
-
-<label>Athlète 2</label>
-<input id="athlete2" placeholder="Nom" />
-<input id="perf2" placeholder="Performance" />
-
-
-<button onclick="showResults()">Afficher les résultats</button>
-</div>
-
-
-<!-- POPUP LCD -->
-<div class="popup" id="popup">
-<div class="lcd-screen">
-<h2 id="sportTitle"></h2>
-
-
-<div class="result-line">
-<span id="resAthlete1"></span>
-<span id="resPerf1"></span>
-</div>
-
-
-<div class="result-line">
-<span id="resAthlete2"></span>
-<span id="resPerf2"></span>
-</div>
-
-
-<button class="close-btn" onclick="closePopup()">FERMER</button>
 </div>
 </div>
 
 
 <script>
-function showResults() {
-document.getElementById('sportTitle').innerText = document.getElementById('sport').value.toUpperCase();
+const athletesDiv = document.getElementById('athletes');
 
 
-document.getElementById('resAthlete1').innerText = document.getElementById('athlete1').value;
-document.getElementById('resPerf1').innerText = document.getElementById('perf1').value;
-
-
-document.getElementById('resAthlete2').innerText = document.getElementById('athlete2').value;
-document.getElementById('resPerf2').innerText = document.getElementById('perf2').value;
-
-
-document.getElementById('popup').style.display = 'flex';
+function addAthlete(name = '', perf = '') {
+const row = document.createElement('div');
+row.className = 'athlete-row';
+row.innerHTML = `
+<input placeholder="Nom de l'athlète" value="${name}" />
+<input placeholder="Performance" value="${perf}" />
+`;
+athletesDiv.appendChild(row);
 }
 
 
-function closePopup() {
-document.getElementById('popup').style.display = 'none';
+addAthlete();
+addAthlete();
+
+
+function showResults() {
+const sport = document.getElementById('sport').value.toUpperCase();
+const rows = document.querySelectorAll('.athlete-row');
+let data = [];
+
+
+rows.forEach(row => {
+const name = row.children[0].value;
+const perf = row.children[1].value;
+const perfNum = parseFloat(perf.replace(',', '.'));
+if (name && perf) {
+data.push({ name, perf, perfNum });
+}
+});
+
+
+data.sort((a, b) => a.perfNum - b.perfNum);
+
+
+document.getElementById('sportTitle').innerText = sport;
+const resultsDiv = document.getElementById('results');
+resultsDiv.innerHTML = '';
+
+
+data.forEach((ath, i) => {
+const line = document.createElement('div');
+line.className = 'result-line';
+line.innerHTML = `
+<div class="rank">${i + 1}</div>
+<div>${ath.name}</div>
+<div style="text-align:right">${ath.perf}</div>
+`;
+resultsDiv.appendChild(line);
+});
+
+
+document.getElementById('formPage').style.display = 'none';
+document.getElementById('resultsPage').style.display = 'block';
+}
+
+
+function goBack() {
+document.getElementById('resultsPage').style.display = 'none';
+document.getElementById('formPage').style.display = 'flex';
 }
 </script>
 
